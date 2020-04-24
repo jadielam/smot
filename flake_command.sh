@@ -1,0 +1,1 @@
+flake8 . --count --select=E9,F63,F72,F82,F4,F60,F62,F70,F81 --show-source --statistics

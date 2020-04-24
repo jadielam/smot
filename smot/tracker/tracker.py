@@ -1,3 +1,5 @@
+import numpy as np
+
 class Tracker(object):
     '''
     - max_age_thresh: The max age of a track is the number of time steps that have \
