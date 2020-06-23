@@ -1,11 +1,10 @@
-import numpy as np
 import torch
 
-class FlowModel(object):
+class AssociationModel(object):
     def __init__(self):
         pass
 
-    def predict(tracks: torch.Tensor):
+    def associate(new_tracks: torch.Tensor):
         '''
         - Arguments:
             - tracks: np.array of shape (nb_tracks, 5)
