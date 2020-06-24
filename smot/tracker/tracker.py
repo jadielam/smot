@@ -77,7 +77,7 @@ class Tracker(object):
         active_tracks_history_t = torch.stack(active_tracks_pos_l)  # shape is: (nb_tracks, tracks_history_length, 4)
         tracks_predictions = self._flow_model.predict(active_tracks_history_t)
 
-        #2. Associate input bboxes to predictions
+        #2. Associate input bboxes to predictions.
         # TODO: Continue here.
 
 

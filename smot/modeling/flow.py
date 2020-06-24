@@ -33,7 +33,18 @@ class FlowModel(object):
     def __init__(self, lr = 0.001):
         self._flow_module = FlowModule()
         self._optimizer = torch.optim.Adam(self._flow_module.parameters(), lr = lr)
-
+        self._loss_balancer = 0
+        
+    def _linear_prediction(self, tracks: torch.Tensor):
+        '''
+        - Arguments:
+            - tracks: torch.Tensor of shape (nb_tracks, track_max_size, 4)
+        
+        - Returns:
+            - preds: (nb_tracks, 4)
+        '''
+        # TODO
+        pass
 
     def predict(self, tracks: torch.Tensor):
         '''
@@ -47,9 +58,10 @@ class FlowModel(object):
         '''
         #1. If flow module is accurate enough, use it
         #2. Otherwise do linear extrapolation
-
-        # TODO
-        pass
+        if self._loss_balancer > 0:
+            return self._flow_module(tracks)
+        else:
+            return self._linear_prediction(tracks)
 
     def update_model(self, tracks: torch.Tensor, gt: torch.Tensor):
         '''
@@ -62,3 +74,10 @@ class FlowModel(object):
         self._optimizer.zero_grad()
         loss.backward()
         self._optimizer.step()
+
+        linear_preds = self._linear_prediction(tracks)
+        linear_preds_loss = loss(preds, gt)
+        if linear_preds_loss > loss:
+            self._loss_balancer += 1
+        else:
+            self._loss_balancer -= 1
