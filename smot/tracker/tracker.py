@@ -13,19 +13,23 @@ class Tracker(object):
     - min_hits: The number of hits of a track is the number of bounding boxes that it 
         contains in its sequence. min_hits is the minimum number of hits a track must have
         to be considered valid.
+    - tracks_history_length: The number of pos entries of a track to keep in memory
+
     '''
-    def __init__(self, max_age_thresh = 7, min_hits = 3):
+    def __init__(self, max_age_thresh = 7, min_hits = 3, tracks_history_length: int):
         self._max_age_thresh = max_age_thresh
         self._min_hits = min_hits
+        self._tracks_history_length = tracks_history_length
         self._tracks: List[Track] = []
         self._flow_model = FlowModel()
+        self._current_time_step = -1
     
     def _get_active_tracks(self) -> List[Track]:
         '''
         - Returns:
             - active_tracks: A list of tracks that are active at the current time.
         '''
-        return [t for t in self._tracks if t.time_since_update < self._max_age_thresh]
+        return [t for t in self._tracks if t.time_since_update(self._current_time_step) < self._max_age_thresh]
     
     def track(self, bboxes: torch.Tensor):
         """
@@ -65,10 +69,23 @@ class Tracker(object):
         - Returns:
             - tracks: A similar array, where the last column is the object or track id.  The number of objects returned may differ from the number of detections provided.
         """
+
+        #1. Predict where current active tracks would be now, using the flow model
+        self._current_time_step += 1
         active_tracks = self._get_active_tracks()
-        active_tracks_pos_l = [a.pos for a in active_tracks]
-        active_tracks_pos_t = torch.stack(active_tracks_pos_l)
-        tracks_predictions = self._flow_model.predict(active_tracks_pos_t)
+        active_tracks_history_l = [a.last_k_pos(self._tracks_history_length) for a in active_tracks]
+        active_tracks_history_t = torch.stack(active_tracks_pos_l)  # shape is: (nb_tracks, tracks_history_length, 4)
+        tracks_predictions = self._flow_model.predict(active_tracks_history_t)
+
+        #2. Associate input bboxes to predictions
+        # TODO: Continue here.
+
+
+
+
+
+
+        
         
 
 

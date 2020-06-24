@@ -1,24 +1,64 @@
-import numpy as np
 import torch
+from torch import nn
 
-class FlowModel(object):
+class FlowModule(nn.Module):
     def __init__(self):
         pass
 
-    def predict(tracks: torch.Tensor):
+    def forward(tracks: torch.Tensor):
         '''
         - Arguments:
-            - tracks: np.array of shape (nb_tracks, 5)
+            - tracks: torch.Tensor of shape (nb_tracks, tracks_max_size, 4)
         
         - Returns:
-            - predictions: np.array of shape (nb_tracks,)
+            - preds: torch.Tensor of shape (nb_tracks, 4)
         '''
+        # TODO
         pass
 
-    def update_model(tracks: torch.Tensor, preds: torch.Tensor):
+
+def loss_fn(preds: torch.Tensor, gt: torch.Tensor):
+    '''
+    - Arguments:
+        - preds: torch.Tensor of shape (nb_tracks, 4)
+        - gt: torch.Tensor of shape (nb_tracks, 4)
+    
+    - Returns:
+        - loss
+    '''
+    # TODO
+    pass
+
+class FlowModel(object):
+    def __init__(self, lr = 0.001):
+        self._flow_module = FlowModule()
+        self._optimizer = torch.optim.Adam(self._flow_module.parameters(), lr = lr)
+
+
+    def predict(self, tracks: torch.Tensor):
+        '''
+        Predicts the next location of the given tracks
+
+        - Arguments:
+            - tracks: np.array of shape (nb_tracks, track_max_size, 4)
+        
+        - Returns:
+            - predictions: np.array of shape (nb_tracks, 4)
+        '''
+        #1. If flow module is accurate enough, use it
+        #2. Otherwise do linear extrapolation
+
+        # TODO
+        pass
+
+    def update_model(self, tracks: torch.Tensor, gt: torch.Tensor):
         '''
         - Arguments:
-            - tracks: torch.Tensor of shape (nb_tracks, track_max_size, 5)
-            - preds: torch.Tensor of shape (nb_tracks,)
+            - tracks: torch.Tensor of shape (nb_tracks, track_max_size, 4)
+            - gt: torch.Tensor of shape (nb_tracks, 4)
         '''
-        pass
+        preds = self._flow_module(tracks)
+        loss = loss_fn(preds, gt)
+        self._optimizer.zero_grad()
+        loss.backward()
+        self._optimizer.step()

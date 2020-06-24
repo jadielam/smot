@@ -1,6 +1,7 @@
 import torch
+from torch import nn
 
-class AssociationModel(object):
+class AssociationModel(nn.Module):
     def __init__(self):
         pass
 

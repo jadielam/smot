@@ -48,16 +48,16 @@ class Track(object):
         - Returns:
             - torch.Tensor of size (4,)
         '''
-        idx = (self._last_tracker_step - self._first_hit_step) % self._history_length
-        return self._track_history[idx]
+        current_idx = (self._last_tracker_step - self._first_hit_step) % self._history_length
+        return self._track_history[current_idx]
     
     def last_k_pos(self, k: int) -> torch.Tensor:
         '''
         - Returns:
             - torch.Tensor of size (k, 4)
         '''
-        # TODO
-        pass
+        current_idx = (self._last_tracker_step - self._first_hit_step) % self._history_length
+        return torch.cat([self._track_history[current_idx + 1:,:], self._track_history[0:current_idx + 1,:]])
 
     @property
     def hits(self):
@@ -71,6 +71,5 @@ class Track(object):
     def hit_streak(self):
         return self._hit_streak
     
-    @property
     def time_since_update(self, current_time_step: int):
         return current_time_step - self._last_tracker_step
