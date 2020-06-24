@@ -54,7 +54,8 @@ class Track(object):
     def last_k_pos(self, k: int) -> torch.Tensor:
         '''
         - Returns:
-            - torch.Tensor of size (k, 4)
+            - torch.Tensor of size (k, 4). The last entry in the first axis represents the most recent
+            track position.
         '''
         current_idx = (self._last_tracker_step - self._first_hit_step) % self._history_length
         return torch.cat([self._track_history[current_idx + 1:,:], self._track_history[0:current_idx + 1,:]])
