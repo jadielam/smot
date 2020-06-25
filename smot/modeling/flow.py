@@ -72,17 +72,19 @@ class FlowModel(object):
 
         #3. For each track, find the number of steps between latest track with non-nan values
         #and now
-        # shape (nb_tracks,)
-        last_index = (~torch.isnan(tracks[:,:,0])).double().argmax(dim = 1)
-        nb_steps = tracks.shape[1] - 1 - last_index
+        last_indexes = (~torch.isnan(tracks[:,:,0])).double().argmax(dim = 1)
+        nb_steps = tracks.shape[1] - last_indexes # shape (nb_tracks,)
         
         #4. Multiply #2 by #3.
-        values_to_add = torch.einsum('ij,i->ij')
-
+        values_to_add = torch.einsum('i,ij->ij', nb_steps, mean_diff) # shape (nb_tracks, 4)
 
         #5. Add #4 to latest track of non-nan values and return.
+        to_return = torch.zeros_like(values_to_add)
+        for idx, last_index in enumerate(last_indexes):
+            to_return[idx] = tracks[idx, last_index, :]
+        to_return = to_return + values_to_add
 
-        pass
+        return to_return
 
     def predict(self, tracks: torch.Tensor):
         '''
